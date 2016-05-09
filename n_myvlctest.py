@@ -110,48 +110,6 @@ class SimpleTopo(Topo):
 
         self.addLink(s1, s2)
 
-# class _1s2h(Topo):
-#     # 1 switches and 2 hosts s
-#     def __init__(self, **opts):
-
-#         Topo.__init__(self, **opts)
-
-#         # Adding switches
-#         s1 = self.addSwitch('s1')
-#         #s2 = self.addSwitch('s2')
-
-
-#         h1 = self.addHost('h1')
-#         h2 = self.addHost('h2')
-#         #h3 = self.addHost('h3')
-#         #h4 = self.addHost('h4')
-
-#         # Adding links
-#         # 15 Mbps bandwidth and 2 ms delay on each link
-#         linkopts = dict(bw=1, delay='2ms', loss=0, use_htb=True)
-#         self.addLink(h1, s1, **linkopts)
-#         self.addLink(h2, s1, **linkopts)
-#         #self.addLink(h3, s2, **linkopts)
-#         #self.addLink(h4, s2, **linkopts)
-#         #self.addLink(s1, s2, **linkopts)
-
-
-# IGNORE
-# def perfTest():
-#     "Create network and run simple performance test"
-#     topo = SingleSwitchTopo(n=4)
-#     net = Mininet(topo=topo,host=CPULimitedHost, link=TCLink)
-#     net.start()
-#     print "Dumping host connections"
-#     dumpNodeConnections(net.hosts)
-#     print "Testing network connectivity"
-#     net.pingAll()
-#     #print "Testing bandwidth between h1 and h4"
-#     #h1, h4 = net.get('h1', 'h4')
-#     #net.iperf((h1, h4))
-#     CLI(net)
-#     net.stop()
-
 def stream(src, dst, input_filename, output_filename, dstIP):
     global stream_time
     local_stream_time = stream_time * (n/2)
