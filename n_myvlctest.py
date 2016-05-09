@@ -75,17 +75,6 @@ savedStreamsDir = join(workingDir, 'savedStreams') # '/home/sumanth/teststorage/
 capturedTracesDir = join(workingDir, 'capturedTraces') # '/home/sumanth/mininetDir/capture_traces'
 
 
-# class SingleSwitchTopo(Topo):
-#     "Single switch connected to n hosts."
-#     def __init__(self, n=2, **opts):
-#         Topo.__init__(self, **opts)
-#         switch = self.addSwitch('s1')
-#         for h in range(n):
-#             #Each host gets 50%/n of system CPU
-#             host = self.addHost('h%s' % (h + 1), cpu=.5/n)
-#             #10 Mbps, 5ms delay, 0% Loss, 1000 packet queue
-#             self.addLink(host, switch, bw=5, delay='5ms', loss=0, max_queue_size=1000, use_htb=True)
-
 class SimpleTopo(Topo):
     global n
     # 2 switches and n hosts (n/2 hosts per switch), a link between 2 switches
@@ -143,6 +132,8 @@ def stream(src, dst, input_filename, output_filename, dstIP):
 
 
 def vlcStream_working(net):
+    # sample testing method to send a vlc video stream from host h1 to h2
+
     h1, h2 = net.get('h1', 'h2')
 
     print 'Executing command on h2'
@@ -167,6 +158,11 @@ def vlcStream_working(net):
     print 'commands on h1, h2 done FINISHED'
 
 def initiateCapture(h):
+    '''
+    Runs a capture script to initiate wireshark capture
+    wireshark capture is used to obtain stats for throughput delay
+    '''
+
     # # 'dummy' is added to not use the zero index
     # h = ['dummy'] # list of hosts
 
@@ -245,6 +241,10 @@ def vlcStream(net):
 
 
 def applyQueues():
+    '''
+    create queues for QoS
+    '''
+
     if not qos:
         print 'No QoS !'
         command = 'sudo ovs-vsctl set port s1-eth%d qos=@newqos -- \
