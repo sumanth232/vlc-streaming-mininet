@@ -236,7 +236,7 @@ def initiateCapture(h):
 def getOutFilepath(inFilepath, i):
     outFile = inFilepath.split('/')[-1]   # gets the actual file name, from the full path name
     outFile = outFile.split('.')[0] + '_%dmb_link_'%bw + 'h%d_to_h%d_'%(2*i-1, 2*i)    + ('qos_' if qos else 'congest_') + '%dhosts'%n + '.mp4'
-    outFile = savedStreamsDir + outFile
+    outFile = join(savedStreamsDir,outFile)
 
     return outFile # returns a filepath
 
