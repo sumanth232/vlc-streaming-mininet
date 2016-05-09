@@ -7,7 +7,7 @@ cp controllers/2snh_ssim_Controller_congest.py ~/pox/pox/misc/
 cp controllers/2snh_ssim_Controller_QoS.py ~/pox/pox/misc/
 ```
 
-Decide the number of hosts in the topology - say 4 for example
+Decide the number of hosts in the topology - say 4 for example <br>
 set the controller file global variable `n = 4`
 then, start running the controller `2snh_ssim_Controller_QoS.py`:
 ```
