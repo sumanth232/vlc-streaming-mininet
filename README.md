@@ -16,5 +16,5 @@ pox/pox.py log.level --DEBUG misc.2snh_ssim_Controller_QoS
 
 Run the python script which sets up the topology (with a total of 4 hosts as decided above) and does vlc-streaming:
 ```
-sudo ./n_myvlctest.py 4
+sudo ./myvlctest.py 4
 ```

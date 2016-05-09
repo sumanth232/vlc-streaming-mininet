@@ -1,0 +1,140 @@
+sudo ovs-vsctl set port s1-eth1 qos=@newqos -- \
+--id=@newqos create qos type=linux-htb other-config:max-rate=1000000000 queues:0=@q0 -- \
+--id=@q0 create queue other-config:min-rate=30000 other-config:max-rate=30000
+
+
+sudo ovs-vsctl -- set Port s1-eth1 qos=@newqos -- \
+--id=@newqos create QoS type=linux-htb other-config:max-rate=1000000000 queues=0=@q0,1=@q1 -- \
+--id=@q0 create Queue other-config:min-rate=1000000000 other-config:max-rate=1000000000 -- \
+--id=@q1 create Queue other-config:min-rate=4000000 other-config:max-rate=4000000
+
+
+sudo ovs-vsctl set port s1-eth3 qos=@newqos -- \
+--id=@newqos create qos type=linux-htb other-config:max-rate=1000000000 queues:0=@q0 -- \
+--id=@q0 create Queue other-config:min-rate=10000000 other-config:max-rate=10000000
+
+
+
+ovs-vsctl -- set Port s1-eth3 qos=@newqos -- \
+--id=@newqos create QoS type=linux-htb other-config:max-rate=1000000000 queues=0=@q0,1=@q1 -- \
+--id=@q0 create Queue other-config:min-rate=10000000 other-config:max-rate=10000000 -- \
+--id=@q1 create Queue other-config:min-rate=4000000 other-config:max-rate=4000000
+
+
+ovs-vsctl -- set Port s1-eth3 qos=@newqos -- \
+--id=@newqos create QoS type=linux-htb other-config:max-rate=1000000000 queues=0=@q0,1=@q1,2=@q2 -- \
+--id=@q0 create Queue other-config:min-rate=500000 other-config:max-rate=500000 -- \
+--id=@q1 create Queue other-config:min-rate=100000 other-config:max-rate=100000 -- \
+--id=@q2 create Queue other-config:min-rate=400000 other-config:max-rate=400000
+
+
+Send on server side
+-------------------
+cvlc -vvv test.mp4 :norm=ntsc :v4l2-width=360 :v4l2-height=240 :v4l2-standard=45056 :channel=1 --sout '#duplicate{dst=rtp{dst=10.109.57.23,port=5004,mux=ts},dst=display}' :sout-keep --ttl 1
+
+cvlc -vvv test.mp4 :channel=1 --sout '#duplicate{dst=rtp{dst=10.109.57.23,port=5004,mux=ts},dst=display}' :sout-keep --ttl 1
+
+cvlc -vvv test.mp4 --sout '#duplicate{dst=rtp{dst=10.109.57.23,port=5004,mux=ts},dst=display}' :sout-keep --ttl 1
+
+
+
+cvlc -vvv test.mp4 --sout '#duplicate{dst=rtp{dst=10.109.57.23,port=5004,mux=ts},dst=display}' :sout-keep 
+
+cvlc -vvv test.mp4 :norm=ntsc :v4l2-width=360 :v4l2-height=240 :v4l2-standard=45056 :channel=1 --sout '#transcode{vb="1600",vcodec=mpgv,acodec=mpga,venc=ffmpeg}:rtp{proto=udp,mux=ts,dst=10.109.57.23,port=5004}' --ttl 1
+
+
+cvlc -vvv test.mp4 --sout '#transcode{vcodec=mp4v,acodec=mpga,vb=800,ab=128,deinterlace}:rtp{mux=ts,dst=239.255.12.42,sdp=sap,name="TestStream"}' 
+
+
+
+
+
+Play on client side
+-------------------
+vlc rtp://@:5004
+
+
+Record on client side
+---------------------
+cvlc rtp://@:5004 --sout "#transcode{vcodec=h264,acodec=mpga,ab=128,channels=2,samplerate=44100}:std{access=file,mux=mp4,dst=output.mp4}"
+
+
+cvlc rtp://@:5004 --sout="#duplicate{dst=std{access=file,mux=ts,dst=output.mp4}}" 
+
+–sout-mux-caching 45000
+
+cvlc rtp://@:5004 –sout-mux-caching 45000 --sout="#duplicate{dst=std{access=file,mux=mp4,dst=output.mp4}}" 
+
+cvlc rtp://@:5004 --sout="#duplicate{dst=std{access=file,mux=mp4,dst=output.mp4},dst=nodisplay}" 
+
+
+239.255.2.1
+239.0.0.1
+
+cvlc -vvv test.mp4 --sout '#duplicate{dst=rtp{dst=239.0.0.1,port=5004,mux=ts},dst=display}'
+
+
+--------------------------------------------
+
+:sout=#transcode{vcodec=h264,acodec=mpga,ab=128,channels=2,samplerate=44100}:duplicate{dst=rtp{dst=10.109.57.23,port=5004,mux=ts},dst=display}
+
+sout=#transcode{vcodec=h264,acodec=mpga,ab=128,channels=2,samplerate=44100}:duplicate{dst=display,dst=std{access=file{no-overwrite},mux=mp4,dst='/home/sumanth/out2.mp4'}}
+
+---------------------------------------
+
+
+
+PERFECT
+
+cvlc -vvv test.mp4 --sout '#transcode{vcodec=h264,acodec=mpga,ab=128,channels=2,samplerate=44100}:duplicate{dst=rtp{dst=10.109.57.23,port=5004,mux=ts},dst=display}'
+
+cvlc rtp://@:5004 --sout 'transcode{vcodec=h264,acodec=mpga,ab=128,channels=2,samplerate=44100}:duplicate{dst=display,dst=std{access=file{no-overwrite},mux=mp4,dst='/home/sumanth/out2.mp4'}}'
+
+
+cvlc rtp://@:5004 --sout "#transcode{vcodec=h264,acodec=mpga,ab=128,channels=2,samplerate=44100}:std{access=file,mux=mp4,dst=output.mp4}"
+
+---------------------------------------------------------------------
+
+WORKING
+
+first enter command on client side
+----------------------------------
+cvlc rtp://@:5004 --sout "#transcode{vcodec=h264,acodec=mpga,ab=128,channels=2,samplerate=44100}:std{access=file,mux=mp4,dst=output.mp4}" --run-time 36 vlc://quit &
+
+The above command by default overwrites the output file if it already exists
+
+then enter on server side
+-------------------------
+cvlc -vvv test.mp4 --sout '#transcode{vcodec=h264,acodec=mpga,ab=128,channels=2,samplerate=44100}:duplicate{dst=rtp{dst=10.109.57.23,port=5004,mux=ts},dst=display}' 
+
+WITHOUT DISPLAY
+cvlc -vvv test.mp4 --sout '#transcode{vcodec=h264,acodec=mpga,ab=128,channels=2,samplerate=44100}:duplicate{dst=rtp{dst=10.0.0.2,port=5004,mux=ts}}' --run-time 36 vlc://quit &
+
+should remove dst=display in script
+
+then do Ctrl+C on client side to put moov atom on the saved stream. THE SAVED VIDEO IS READY
+
+doing first on server and then client giving error on client side, that it cannot add stream, mux error
+
+
+----------------------------------------------------------------------------------
+
+
+cvlc rtp://@:5004 --sout "#transcode{vcodec=h264,acodec=mpga,ab=128,channels=2,samplerate=44100}:std{access=file,mux=mp4,dst=output.mp4}" --run-time 36 vlc://quit
+
+
+to stop cvlc, asks to give both below option stop and run time
+https://forum.videolan.org/viewtopic.php?t=41489
+
+--stop-time is not all effective when given alone,
+--run-time is effective when given alone
+
+
+
+
+
+# both '-- set Port' and 'set port' are working
+# both QoS and qos are working
+# both 'queues:0=@q0' and 'queues=0=@q0' are working
+
+
