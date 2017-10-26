@@ -19,7 +19,6 @@ Run the python script which sets up the topology (with a total of 4 hosts as dec
 $ sudo ./myvlctest.py 4
 ```
 
-
-
-Sidenote:
+<br>
+<br>
 Youtube link to stream a video between 2 hosts manually in mininet using VLC media player - https://www.youtube.com/watch?v=dhwXQ5Th58M
